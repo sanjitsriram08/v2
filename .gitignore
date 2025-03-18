@@ -1,4 +1,4 @@
 /node_modules
 /.env
 /app.log
-/config/push-key.json
+/config/push-key.json"config/push-key.json" 
