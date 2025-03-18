@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f5306820-7fb0-4602-b925-89c947e3786a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../.firebaserc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.metadata" beforeDir="false" afterPath="$PROJECT_DIR$/../.metadata" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/java/io/flutter/app/FlutterMultiDexApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/kotlin/com/example/krdx/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/kotlin/com/example/krdx/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../android/settings.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../assets/images/O-Notify-bg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../assets/images/O-Notify.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../assets/images/O-Notify_Old.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../firebase.json" beforeDir="false" afterPath="$PROJECT_DIR$/../firebase.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ios/Runner/GoogleService-Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../ios/Runner/GoogleService-Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../ios/Runner/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/firebase_options.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/firebase_options.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/l10n/app_en.arb" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/l10n/app_en.arb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/l10n/app_ja.arb" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/l10n/app_ja.arb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/models/ad.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/models/ad.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/models/message.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/models/message.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/models/user.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/models/user.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/admin/ads_create_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/admin/ads_create_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/admin/ads_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/admin/ads_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/admin/home_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/admin/home_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/admin/news_create_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/admin/news_create_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/admin/root_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/admin/root_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/admin/user_activation_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/admin/user_activation_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/common/ErrorPage.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/common/auth_services.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/common/login_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/common/login_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/common/news_display_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/common/news_display_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/common/news_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/common/news_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/common/no_internet_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/common/no_internet_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/common/notification_bottom_sheet.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/common/notification_bottom_sheet.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/common/notification_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/common/notification_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/common/profile_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/common/profile_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/common/splash_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/common/splash_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/super-admin/admin_add_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/super-admin/admin_add_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/super-admin/admins_manage_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/super-admin/admins_manage_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/super-admin/root_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/super-admin/root_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/super-admin/users_manage_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/super-admin/users_manage_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/user/home_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/user/home_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/user/order_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/user/order_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/user/payment_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/user/payment_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/user/plan_bottom_sheet.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/user/plan_bottom_sheet.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/user/plan_change_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/user/plan_change_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/user/plans_page_mobile.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/user/plans_page_mobile.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/user/plans_page_web.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/user/plans_page_web.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/user/register_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/user/register_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/modules/user/root_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/modules/user/root_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/providers/UserProvider.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/services/LocalServices.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/utils/banner.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/utils/banner.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/utils/color.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/utils/color.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/utils/constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/utils/constants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/utils/plans.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/utils/plans.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/utils/utils.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/utils/utils.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/widgets/ad_banner.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/widgets/ad_banner.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/widgets/button.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/widgets/button.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/widgets/google_ads.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/widgets/notification_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/widgets/notification_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/widgets/plan_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/widgets/plan_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/widgets/text_formfield.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/widgets/text_formfield.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../linux/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../linux/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/../linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/../linux/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/../macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../macos/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../macos/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../macos/Runner/Configs/AppInfo.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/../macos/Runner/Configs/AppInfo.xcconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../test/widget_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../test/widget_test.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/favicon.png" beforeDir="false" afterPath="$PROJECT_DIR$/../web/favicon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/firebase-messaging-sw.js" beforeDir="false" afterPath="$PROJECT_DIR$/../web/firebase-messaging-sw.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../web/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/../web/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/../windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/../windows/flutter/generated_plugins.cmake" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="Security-fix" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2nyml6DOzKdSY5TPIbI1qbiKA3T" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;20.10.0&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;20.10.8&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Appdev23/nikoniko_server&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Debug&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2024.2.4\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Appdev23\krdx\server\support_files\en\docx_files" />
+      <recent name="D:\Appdev23\krdx\server\support_files" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Appdev23\krdx\server\support_files\ja\docx_files" />
+      <recent name="D:\Appdev23\krdx\server\support_files\en" />
+      <recent name="D:\Appdev23\krdx\server\support_files\ja" />
+      <recent name="D:\Appdev23\krdx\server\files" />
+      <recent name="D:\Appdev23\krdx\server\constants" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-WS-242.24807.6" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f5306820-7fb0-4602-b925-89c947e3786a" name="Changes" comment="" />
+      <created>1729953838113</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1729953838113</updated>
+      <workItem from="1731078650293" duration="42315000" />
+      <workItem from="1731212406176" duration="14623000" />
+      <workItem from="1731247843132" duration="7405000" />
+      <workItem from="1731296076083" duration="4440000" />
+      <workItem from="1731765653438" duration="831000" />
+      <workItem from="1732417933106" duration="72000" />
+      <workItem from="1732418694158" duration="61632000" />
+      <workItem from="1733158971312" duration="9915000" />
+      <workItem from="1733324147550" duration="32467000" />
+      <workItem from="1733644045733" duration="433000" />
+      <workItem from="1733645541465" duration="14659000" />
+      <workItem from="1733794216257" duration="1207000" />
+      <workItem from="1733795478291" duration="1114000" />
+      <workItem from="1733939079370" duration="23546000" />
+      <workItem from="1734186524267" duration="1659000" />
+      <workItem from="1734188283791" duration="261000" />
+      <workItem from="1734189125026" duration="72237000" />
+      <workItem from="1734379419805" duration="326000" />
+      <workItem from="1734451767764" duration="18544000" />
+      <workItem from="1735058569473" duration="1265000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

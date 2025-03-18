@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>limit-order</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        p, ul, ol {
+            margin-bottom: 15px;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-height: 400px; /* Limit image height */
+            object-fit: contain; /* Ensure the image maintains its aspect ratio */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f4f4f9;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        blockquote {
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #555;
+            background: #f9f9f9;
+        }
+
+        code, pre {
+            background-color: #f4f4f9;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            border-radius: 5px;
+            display: block;
+            margin: 15px 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        /* Overflow handling for large content */
+        .container > * {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>値注文（さしねちゅうもん）とは、株式や先物、FXなどの金融商品を取引する際に、「この価格で取引をしたい」という具体的な価格を指定する注文方法です。買い注文と売り注文のどちらにも適用されます。</p><p> </p><p>指値注文の仕組み</p><p>買い注文の場合:</p><p>指定した価格以下で購入したい場合に使用します。</p><p>例: 「1000円以下で買いたい」と指値注文を出すと、価格が1000円以下になった時に注文が成立します。</p><p>売り注文の場合:</p><p>指定した価格以上で売却したい場合に使用します。</p><p>例: 「1200円以上で売りたい」と指値注文を出すと、価格が1200円以上になった時に注文が成立します。</p><p>詳細は取引口座がホームページをご参照ください。</p><h3><strong>指値注文のメリット</strong></h3><ul><li><strong>希望の価格で取引ができる</strong>:<br />指定した価格でのみ注文が成立するため、計画的な取引が可能です。</li><li><strong>感情的な判断を避けられる</strong>:<br />市場が急激に動いても冷静に取引できます。</li><li><strong>価格をコントロールできる</strong>:<br />想定外の不利な価格での取引を防げます。</li></ul><h3><strong>指値注文のデメリット</strong></h3><ul><li><strong>注文が成立しない場合がある</strong>:<br />市場の価格が指定した価格に達しない場合、取引は実行されません。</li><li><strong>短期間での急激な価格変動に対応しづらい</strong>:<br />市場が急騰や急落した場合、注文がスキップされる可能性があります。</li></ul><h3><strong>指値注文の使用例</strong></h3><h4><strong>買い注文の例:</strong></h4><p>現在の株価が1200円の銘柄を、1000円以下で購入したい場合:</p><ul><li>「指値 1000円」と注文を出します。</li><li>株価が1000円以下に下がると注文が成立します。</li></ul><h4><strong>売り注文の例:</strong></h4><p>現在の株価が900円の銘柄を、1200円以上で売却したい場合:</p><ul><li>「指値 1200円」と注文を出します。</li><li>株価が1200円以上に上がると注文が成立します。</li></ul><h3><strong>指値注文と成行注文の違い</strong></h3><table><tr><td><p><strong>項目</strong></p></td><td><p><strong>指値注文</strong></p></td><td><p><strong>成行注文</strong></p></td></tr><tr><td><p><strong>価格指定</strong></p></td><td><p>価格を指定する</p></td><td><p>価格を指定しない（市場価格で取引）</p></td></tr><tr><td><p><strong>成立の条件</strong></p></td><td><p>指定した価格にならないと成立しない</p></td><td><p>価格が合えば即時成立</p></td></tr><tr><td><p><strong>メリット</strong></p></td><td><p>希望価格で取引可能</p></td><td><p>素早く取引可能</p></td></tr><tr><td><p><strong>デメリット</strong></p></td><td><p>成立しない可能性がある</p></td><td><p>不利な価格で取引される可能性あり</p></td></tr></table><h3><strong>指値注文が向いている場面</strong></h3><ul><li><strong>価格にこだわりたい場合</strong>:<br />一定の価格以上で売りたい、または以下で買いたい場合に有効です。</li><li><strong>市場が急変している場合</strong>:<br />突発的な値動きで損を避けたい時に役立ちます。</li><li><strong>中長期的な投資計画</strong>:<br />長期間保持したい銘柄や商品を特定の価格で取得したい場合。</li></ul><p>指値注文は、計画的に取引を進めたい投資家にとって基本的かつ重要な手法です。</p>
+    </div>
+    <footer>
+        <p>© 2024 NikoNiko. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+

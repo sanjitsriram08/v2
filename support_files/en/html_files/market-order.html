@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>market-order</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        p, ul, ol {
+            margin-bottom: 15px;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-height: 400px; /* Limit image height */
+            object-fit: contain; /* Ensure the image maintains its aspect ratio */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f4f4f9;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        blockquote {
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #555;
+            background: #f9f9f9;
+        }
+
+        code, pre {
+            background-color: #f4f4f9;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            border-radius: 5px;
+            display: block;
+            margin: 15px 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        /* Overflow handling for large content */
+        .container > * {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>成り行き注文はなんですか？</p><p>成り行き注文（Market Order）は、株式、取引において、現在の市場価格で即座に売買を行う注文方法です。この注文方法は、最速で取引を成立させたい場合に使用されます。</p><p> </p><p>成り行き注文の特徴</p><p>即時執行:</p><p>指値注文と異なり、価格を指定せずに市場の現在の価格で即時に取引が行われます。</p><p>価格は未確定:</p><p>市場の状況によって、実際の約定価格が異なる場合があります。取引が集中している場合、想定していた価格より高く買ったり、安く売ったりする可能性があります（スリッページ）。</p><p>約定の確実性が高い:</p><p>価格は指定できませんが、売買が成立しやすく、素早くポジションを取得したいときに有効です。</p><p>使用例</p><p>1. 買い注文:</p><p> </p><p>現在の株価が1,000円のとき、「今すぐ買いたい」と思ったら、成り行き注文を出すと1,000円で購入することができます。</p><p>しかし、他のトレーダーの注文状況によっては、1,001円や1,002円で約定することもあります。</p><p>2. 売り注文:</p><p> </p><p>株価が上がっている状態で「今すぐ売りたい」と思った場合、成り行き注文を出すと、現在の市場価格で即座に売却されます。</p><p>成り行き注文のメリット</p><p>スピード重視:</p><p>すぐに取引を成立させたいときに最適。</p><p>シンプルな操作:</p><p>価格を指定しないので、初心者にもわかりやすい。</p><p>成り行き注文のデメリット</p><p>スリッページのリスク:</p><p>特に価格変動が激しい市場では、想定よりも不利な価格で約定するリスクがあります。</p><p>取引コストが予測しづらい:</p><p>約定価格が事前にわからないため、コスト計算が難しい場合があります。</p><p>成り行き注文と指値注文の違い</p><p>特徴	成り行き注文	指値注文</p><p>価格指定	なし	あり</p><p>約定の確実性	高い	価格条件次第で不確定</p><p>スリッページ	あり	なし</p><p>執行速度	速い	条件により異なる</p><p>成り行き注文を使う場面</p><p>短期トレードやデイトレードで、すぐにポジションを持ちたい場合。</p><p>市場の流動性が高い時間帯や取引量が多い銘柄で、スリッページのリスクが低いと判断した場合。</p><p>損切りや利益確定を急ぎたいときに使用。</p><p>まとめ</p><p>成り行き注文は、スピード重視で取引を成立させたいときに便利な注文方法です。しかし、スリッページのリスクがあるため、市場の状況や価格の変動をよく見極めて使用することが重要です。特に価格変動が大きい銘柄やボラティリティの高い時間帯では、予想外の価格で約定する可能性があるため、注意が必要です。</p><p> </p><p>何か質問や他の注文方法についての詳細が知りたい場合は教えてください！</p>
+    </div>
+    <footer>
+        <p>© 2024 NikoNiko. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+

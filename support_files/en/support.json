@@ -1,0 +1,132 @@
+[
+  {
+    "title": "Basic information",
+    "subTitles": [
+      {
+        "text": "How to register user?",
+        "description": "",
+        "url": ""
+      },
+      {
+        "text": "About this APP?",
+        "description": "取引を支援するツールです。取引の効率を上げ、リスクを管理し、戦略的な判断をサポートするために利用されます。",
+        "url": "about-the-app"
+      },
+      {
+        "text": "Is this an financial advisor?",
+        "description": "これは、お客様の取引戦略をサポートするために考慮する情報にすぎません。これは、あなたの取引に対するアドバイス、指示等ではありません。",
+        "url": "ordertype-message"
+      },
+      {
+        "text": "For More Queries",
+        "description": "in-app-page",
+        "url": "0"
+      }
+    ],
+    "pages": [
+      {
+        "page": "enquiryPage"
+      }
+    ]
+  },
+  {
+    "title": "Plans and payment",
+    "subTitles": [
+      {
+        "text": "How to purchase plans?",
+        "description": "現在、3 つのプランが利用可能です。高度な信号を受信するには、ユーザーはいずれかのプランを購入する必要があります。",
+        "url": "plan-details"
+      },
+      {
+        "text": "How to get refund of payment?",
+        "description": "大変申し訳ありませんがいかなる理由があっても, お支払い後の返金は一切お受けできませんので、あらかじめご了承ください。",
+        "url": ""
+      }
+    ],
+    "pages": []
+  },
+  {
+    "title": "Notification",
+    "subTitles": [
+      {
+        "text": "Notification history?",
+        "description": "Refer notification history tab in APP/WEB",
+        "url": ""
+      },
+      {
+        "text": "Is this an investment advisor?",
+        "description": "これは、お客様の取引戦略をサポートするために考慮する情報にすぎません。これは、お客様の取引に対するアドバイス、指示等ではありません。",
+        "url": "not-a-advice"
+      },
+      {
+        "text": "About notifications",
+        "description": "メッセージには 2 種類があります。",
+        "url": "ordertype-message"
+      }
+    ],
+    "pages": []
+  },
+  {
+    "title": "Install IOS/Android",
+    "subTitles": [
+      {
+        "text": "IOS",
+        "description": "iPhoneのホーム画面にWebアプリやWebページを追加する方法はとても簡単です。これを行うことで、特定のWebサイトをアプリのようにホーム画面から素早くアクセスできます。",
+        "url": "install-app-ios"
+      },
+      {
+        "text": "Android",
+        "description": "",
+        "url": ""
+      },
+      {
+        "text": "Steps to add WEB APP in iPhone home screen.",
+        "description": "iPhoneのホーム画面にWebアプリやWebページを追加する方法はとても簡単です。これを行うことで、特定のWebサイトをアプリのようにホーム画面から素早くアクセスできます。",
+        "url": "install-app-ios"
+      }
+    ],
+    "pages": []
+  },
+  {
+    "title": "Trade",
+    "subTitles": [
+      {
+        "text": "How to create a shoken account",
+        "description": "",
+        "url": "Nikki-mini"
+      },
+      {
+        "text": "Shoken kaisya jyouhou",
+        "description": "",
+        "url": "Nikki-mini"
+      }
+    ],
+    "pages": []
+  },
+  {
+    "title": "Order Types",
+    "subTitles": [
+      {
+        "text": "Market Order",
+        "description": "成り行き注文（Market Order）は、株式、取引において、現在の市場価格で即座に売買を行う注文方法です。この注文方法は、最速で取引を成立させたい場合に使用されます。",
+        "url": "market-order"
+      },
+      {
+        "text": "Limit Order",
+        "description": "値注文（さしねちゅうもん）とは、株式や先物、FXなどの金融商品を取引する際に、「この価格で取引をしたい」という具体的な価格を指定する注文方法です。買い注文と売り注文のどちらにも適用されます。",
+        "url": "limit-order"
+      },
+      {
+        "text": "How to close an order?",
+        "description": "感情に左右されない、\n\n事前に決めたルールや戦略に従い、冷静に行動することが重要。",
+        "url": "close-order"
+      },
+      {
+        "text": "How to find order type in message",
+        "description": "メッセージには 2 種類があります。",
+        "url": "ordertype-message"
+      }
+    ],
+    "pages": []
+  }
+]

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .email-header h1 {
+            font-size: 22px;
+            margin: 0;
+            color: #333;
+        }
+        .email-body {
+            padding: 20px 0;
+        }
+        .email-body p {
+            margin: 10px 0;
+            color: #555;
+        }
+        .email-footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #999;
+        }
+        .highlight {
+            color: #007BFF;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="email-header">
+        <h1>Support Request Resolved</h1>
+    </div>
+    <div class="email-body">
+        <p>Hi <span class="highlight"><%= enquiry.name %></span>,</p>
+        <p>We are pleased to inform you that your support request with reference ID <span class="highlight"><%= enquiry.formatted_id %></span> has been successfully resolved.</p>
+        <p>Thank you for choosing <span class="highlight">NikoNiko</span>.</p>
+    </div>
+    <div class="email-footer">
+        <p>This is an automated message. Please do not reply directly to this email.</p>
+        <p>&copy; NikoNiko. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>

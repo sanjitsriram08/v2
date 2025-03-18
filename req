@@ -1,0 +1,28 @@
+//create user
+//register
+{
+    requset
+
+header:Content-Type: application/json
+body(raw)=>
+    {
+        "fname": "John",
+        "lname": "Doe",
+        "dob": "1990-01-01",
+        "phone": "+1234567890",
+        "email": "johndoe@example.com",
+        "country": "Japan",
+        "password": "yourpassword123",
+        "isJapanese": true
+    }
+
+response
+
+    {
+        "message": "User registered"
+    }
+}
+
+//login
+{
+    requset
