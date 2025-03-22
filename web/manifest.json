@@ -1,6 +1,6 @@
 {
-    "name": "NikoNiko",
-    "short_name": "NikoNiko",
+    "name": "nikoniko",
+    "short_name": "nikoniko",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

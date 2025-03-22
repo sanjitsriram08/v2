@@ -1529,40 +1529,54 @@ app.get(`/${encodePermissions(false, false, true)}/portal/:token`, async (req, r
     }
 });
 
+
+
 async function createSupportFilesEndpoints(language) {
     try {
+        // Define the directory path where HTML files are stored for the given language
         const dirPath = path.join(__dirname, 'support_files', language, 'html_files');
+        
+        // Read the directory to get a list of files
         readdir(dirPath, (err, files) => {
-            if (error) {
+            if (error) {  // Handle errors during directory reading
                 console.error('Error reading directory:', err);
                 return;
             }
 
-            // Filter .html files
+            // Filter the files to only include .html files
             const htmlFiles = files.filter(file => file.endsWith('.html'));
-            // Create an endpoint for each HTML file
+
+            // Loop through each .html file and create an endpoint for it
             for (const file of htmlFiles) {
+                // Create a URL route for the file based on its name and language
                 const routeName = `/support/${language}/${path.basename(file, '.html')}`;
+                
+                // Get the full path to the file
                 const filePath = path.join(dirPath, file);
 
+                // Define a GET route to serve the HTML file
                 app.get(routeName, (req, res) => {
-                    res.sendFile(filePath, err => {
-                        if (error) {
+                    res.sendFile(filePath, err => {  // Send the HTML file as a response
+                        if (error) {  // Handle errors if the file fails to send
                             console.error(`Error sending file ${filePath}:`, err);
                             res.status(500).send('Internal Server Error');
                         }
                     });
                 });
 
+                // Log the creation of the endpoint to the console
                 console.log(`Endpoint created: ${routeName}`);
             }
         });
-    } catch (error) {
+    } catch (error) {  // Handle any other errors during the process
         logger.error(`Error occurred: ${error.message}`);
         logger.error(`Stack: ${error.stack}`);
         console.error(`Error reading directory or creating endpoints for ${language}:`, err);
     }
 }
+
+
+
 
 (async function () {
     await createSupportFilesEndpoints('en');
@@ -1627,3 +1641,10 @@ app.post(`/api/${encodePermissions(true, false, false)}/register`, async (req, r
         return res.sendStatus(500);
     }
 });
+
+
+
+
+
+
+

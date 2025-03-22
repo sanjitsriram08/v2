@@ -23,48 +23,14 @@
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="NikoNiko">
-  <link rel="apple-touch-icon" href="icons/Icon-512.png">
+  <meta name="apple-mobile-web-app-title" content="nikoniko">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="icons/Icon-512.png"/>
+  <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>NikoNiko</title>
+  <title>nikoniko</title>
   <link rel="manifest" href="manifest.json">
-  <script type="module" src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/9.6.8/firebase-messaging.js"></script>
-  <script>
-    window.addEventListener('load', function(ev) {
-      // Download main.dart.js
-
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/firebase-messaging-sw.js");
-
-        navigator.serviceWorker.ready
-        .then((swReg) => {
-          console.log('Service Worker is registered', swReg);
-        })
-        .catch(function(error) {
-          console.error('Service Worker Error', error);
-        });
-      }
-
-      _flutter.loader.load({
-        serviceWorker: {
-          serviceWorkerVersion: "1601112741"',
-        },
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
-    });
-
-    window.addEventListener("message", (event) => {
-      console.log(`Received message: ${event.data}`);
-    });
-  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
