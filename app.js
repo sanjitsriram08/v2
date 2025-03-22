@@ -1,7 +1,6 @@
 const express = require("express");
 require('dotenv').config();
 const app = express();
-const { client } = require("./config/dbconfig");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const auth = require("./middleware/auth");
@@ -14,7 +13,16 @@ const { sq } = require("./config/dbconfig");
 const { Op } = require("sequelize");
 const moment = require('moment');
 const crypto = require('crypto');
-const {User,UserLog, Payment, Client, Message, MessageReceiver, Enquiry, Ad, AdsFrequency, News} = require("./models/model");
+const {
+    User,
+    UserLog,
+    Payment,
+    Client,
+    Message,
+    MessageReceiver,
+    Enquiry,
+    Ad, AdsFrequency, News, Plan
+} = require("./models/model");
 const sendEmail = require('./utils/sendEmail');
 const { encodePermissions } = require('./utils/authUtil');
 const randomString = require('randomstring');
@@ -22,7 +30,6 @@ const { readdir, readFile, readFileSync } = require("node:fs");
 const { render } = require('ejs');
 const { hasAccess } = require('./utils/authUtil');
 const logger = require('./middleware/logger');
-const { error } = require("node:console");
 
 function generateHash(text, secret) {
     return crypto.createHmac('sha256', secret).update(text).digest('hex');
@@ -47,7 +54,7 @@ app.use(
     express.json({
         verify: function (req, res, buf) {
             if (req.originalUrl.startsWith("/webhook")) {
-                req.rawBody = buf.toString();//raw data is stored in this
+                req.rawBody = buf.toString();
             }
         },
     })
@@ -84,49 +91,70 @@ const parseDate = (dob) => {
 };
 
 // getting user data
-// Define a GET route with a dynamic path based on permissions
 app.get(`/api/${encodePermissions(true, true, true)}/data`, auth, async (req, res) => {
     try {
-        // Find the user based on their ID (from `req.id`) in the User model
-        const user = await User.findOne({
-            where: { id: req.id }, // Match user by ID
-            attributes: { exclude: ['password'] }, // Exclude password from the result
-            include: [
-                {
-                    model: UserLog, // Include related UserLog model
-                    as: 'user_log', // Use 'user_log' as the alias
-                    required: false, // Allow null UserLog (no strict requirement)
-                    attributes: ['start_date', 'end_date', 'plan'], // Include specified UserLog fields
-                    include: [
-                        {
-                            model: Payment, // Include related Payment model
-                            as: 'payment', // Use 'payment' as the alias
-                            required: false, // Allow null Payment (no strict requirement)
-                            attributes: ['payment_date', 'end_date'], // Include specified Payment fields
-                        },
-                    ],
-                },
-            ],
+        if (req.type === "2") {
+            return res.status(200).send({
+                "type": "2",
+            });
+        }
+        await sq.transaction(async (t) => {
+            const user = await User.findOne({
+                where: { id: req.id },
+                attributes: { exclude: ['password'] },
+                include: [
+                    {
+                        model: UserLog,
+                        as: 'user_log', // Alias for UserLog
+                        required: false, // Allow UserLog to be null
+                        attributes: [
+                            'start_date', // Alias for start_date
+                            'end_date', // Alias for end_date
+                            'plan', // Include plan as-is
+                        ],
+                        include: [
+                            {
+                                model: Payment, // Include Payment model
+                                as: 'payment', // Alias for Payment
+                                required: false, // Allow Payment to be null
+                                attributes: [
+                                    'payment_date', // Alias for payment_date
+                                    'end_date', // Alias for Payment end_date
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            });
+
+            const plans = await Plan.findAll({ order: [["plan_name"]] });
+
+            const news = await News.findAll({
+                order: [['id', 'DESC']], // Order by `id` in descending order
+                limit: 5, // Limit the results to 5 rows
+            });
+
+            return res.status(200).send({ ...user.toJSON(), plans, news });
         });
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
 
-        // Send the retrieved user data as a response
-        res.status(200).send(user);
-    } catch (error) {
-        // Log the error message and stack trace
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-
-        // Return a 500 Internal Server Error response
         return res.sendStatus(500);
     }
 });
-
 
 // LOGIN (USERS AND ADMIN)
 app.post(`/api/${encodePermissions(false, false, false)}/login`, async (req, res) => {
     let { email, password, fcmtoken, platform } = req.body;
 
     try {
+        if (email == process.env.SUPERADMIN_EMAIL && password == process.env.SUPERADMIN_PASSWORD) {
+            return res.status(200).send({
+                "type": "2",
+                "token": jwt.sign({ email: email, password: password, type: "2" }, "passwordKey")
+            });
+        }
         // Retrieve user along with associated UserLog and Payment data
         await sq.transaction(async (t) => {
             const user = await User.findOne({
@@ -167,8 +195,15 @@ app.post(`/api/${encodePermissions(false, false, false)}/login`, async (req, res
             const isMatch = password === decrypt(user.password);
 
             if (!isMatch) {
-                return res.status(400).json({ message: "Incorrect Password" });
+                return res.status(400).json({ code: 1003, message: "Incorrect Password" });
             }
+
+            const plans = await Plan.findAll({ order: [["plan_name"]] });
+
+            const news = await News.findAll({
+                order: [['id', 'DESC']], // Order by `id` in descending order
+                limit: 5, // Limit the results to 5 rows
+            });
 
             const token = jwt.sign({ id: user.id }, "passwordKey");
 
@@ -178,13 +213,15 @@ app.post(`/api/${encodePermissions(false, false, false)}/login`, async (req, res
                     defaults: { user_id: user.id, platform: platform },
                     transaction: t,
                 });
+            } else if (user.type === "-1") {
+                return res.status(200).send({ "type": user.type })
             }
-            return res.status(200).send({ ...user.toJSON(), token });
+            return res.status(200).send({ ...user.toJSON(), token, plans, news });
         });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error(error.message);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error(e.message);
         return res.sendStatus(500);
     }
 });
@@ -236,10 +273,10 @@ app.put(`/api/${encodePermissions(false, true, true)}/profile`, auth, async (req
             console.log("Profile Updated");
             return res.status(200).json({ message: "Profile Updated" });
         }
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error(error.message);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error(e.message);
         return res.sendStatus(500);
     }
 });
@@ -252,7 +289,7 @@ app.post(`/api/${encodePermissions(false, false, false)}/register`, async (req, 
         // Check if the user with the given email already exists
         const existingUser = await User.findOne({ where: { email: email } });
         if (existingUser) {
-            return res.status(400).json({ message: "Email already exists" });
+            return res.status(400).json({ code: 1001, message: "Email already exists" });
         }
 
         // Create a new user and log the registration
@@ -262,7 +299,7 @@ app.post(`/api/${encodePermissions(false, false, false)}/register`, async (req, 
                 {
                     fname: fname,
                     lname: lname,
-                    dob: dob ? parseDate(dob) : null, // Convert string to Date object
+                    dob: dob !== "" ? parseDate(dob) : null, // Convert string to Date object
                     phone: phone,
                     email: email,
                     country: country,
@@ -279,10 +316,10 @@ app.post(`/api/${encodePermissions(false, false, false)}/register`, async (req, 
 
         console.log("User registered");
         return res.status(200).json({ message: "User registered" });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error("Error registering user:", error);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error("Error registering user:", e);
         return res.sendStatus(500);
     }
 });
@@ -310,7 +347,7 @@ app.post(`/api/${encodePermissions(true, false, false)}/admins/register`, async 
                     email: email,
                     country: country,
                     password: hashedpwd,
-                    type: "1",
+                    type: "-1",
                     is_japanese: isJapanese
                 },
                 { transaction: t }
@@ -322,10 +359,10 @@ app.post(`/api/${encodePermissions(true, false, false)}/admins/register`, async 
 
         console.log("Admin registered");
         return res.status(200).json({ message: "Admin registered" });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error("Error registering user:", error);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error("Error registering user:", e);
         return res.sendStatus(500);
     }
 });
@@ -355,11 +392,11 @@ app.get(`/api/${encodePermissions(false, true, true)}/messages`, auth, async (re
         });
         console.log("Messages fetched");
         return res.status(200).json(messages);
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
 
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: e.message });
     }
 });
 
@@ -397,11 +434,11 @@ app.get(`/api/${encodePermissions(false, true, true)}/messages/latest`, auth, as
             return res.status(200).json(messages);
         }
         return res.sendStatus(400);
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
 
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: e.message });
     }
 });
 
@@ -413,11 +450,11 @@ app.get(`/api/${encodePermissions(false, true, true)}/news`, auth, async (req, r
         });
         console.log("news fetched");
         return res.status(200).json(news); // Return the fetched rows
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
 
-        return res.status(500).json({ error: error.message }); // Handle errors
+        return res.status(500).json({ error: e.message }); // Handle errors
     }
 });
 
@@ -430,11 +467,11 @@ app.get(`/api/${encodePermissions(false, true, true)}/news/latest`, auth, async 
         });
         console.log("news fetched");
         return res.status(200).json(news.length > 0 ? news : null);
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
 
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: e.message });
     }
 });
 
@@ -444,10 +481,10 @@ app.get(`/api/${encodePermissions(false, true, true)}/ads`, async (req, res) => 
         const ads = await Ad.findAll();
         const frequency = await AdsFrequency.findOne({ where: { id: 1 } });
         res.status(200).send({ ads: ads, frequency: frequency.frequency });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error("Error getting ads:", error);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error("Error getting ads:", e);
         return res.sendStatus(500);
     }
 });
@@ -462,156 +499,134 @@ app.delete(`/api/${encodePermissions(false, true, true)}/FCMToken/:fcmToken`, au
             },
         });
         return res.status(200).json(true); // Send success response if deletion is successful
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error({ error: error.message });
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error({ error: e.message });
         return res.sendStatus(500); // Send error response if an exception occurs
     }
 });
 
-
+//sending push notifications
 app.post(`/api/${encodePermissions(false, true, false)}/message`, auth, async (req, res) => {
-    let { id, title2, number2, message2 } = req.body; // Extracting fields from the request body.
-
-    // Initialize a sender for FCM (Firebase Cloud Messaging).
     const sender = fcm();
-
+    const {id, title2, number2, message2} = req.body;
+    console.log({id, title2, number2, message2});
     try {
-        // Step 1: Insert the message into the "messages" table and store the inserted ID and timestamp.
-        client.query(
-            `
-      WITH inserted_message AS (
-        INSERT INTO messages(sender, title2, number2, message2)
-        VALUES($1, $2, $3, $4)
-        RETURNING id, timestamp_column
-      ),
-      inserted_receivers AS (
-        -- Insert into "message_receiver" for all eligible users who should receive the message.
-        INSERT INTO message_receiver(message_id, receiver_id)
-        SELECT DISTINCT im.id, u.id
-        FROM inserted_message im
-        CROSS JOIN users u
-        LEFT OUTER JOIN user_log ul ON u.id = ul.user_id
-        WHERE
-            (u.type = '0' -- Conditions based on user type and session time for message delivery.
-            AND ul.end_date >= (EXTRACT(EPOCH FROM CURRENT_TIMESTAMP AT TIME ZONE 'UTC') * 1000)::BIGINT
-            AND ul.start_date <= (EXTRACT(EPOCH FROM CURRENT_TIMESTAMP AT TIME ZONE 'UTC') * 1000)::BIGINT
-            AND (
-                -- Conditions based on session plans and delivery time windows.
-                (ul.plan IN (
-                    SELECT monthly_price_id FROM plans WHERE session = '0'
-                    UNION ALL
-                    SELECT yearly_price_id FROM plans WHERE session = '0'
-                ) AND CURRENT_TIME AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' BETWEEN TIME '06:00' AND TIME '15:30')
-                OR
-                (ul.plan IN (
-                    SELECT monthly_price_id FROM plans WHERE session = '1'
-                    UNION ALL
-                    SELECT yearly_price_id FROM plans WHERE session = '1'
-                ) AND
-                (CURRENT_TIME AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' >= TIME '16:00' OR CURRENT_TIME  AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' <= TIME '06:00'))
-                OR
-                (ul.plan IN (
-                    SELECT monthly_price_id FROM plans WHERE session = '2'
-                    UNION ALL
-                    SELECT yearly_price_id FROM plans WHERE session = '2'
-                ) AND
-                (CURRENT_TIME AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' BETWEEN TIME '06:00' AND TIME '15:30' OR CURRENT_TIME  AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' >= TIME '16:00' OR CURRENT_TIME  AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' <= TIME '06:00'))
-            ))
-            OR
-            (u.type = '1')
-        )
-        SELECT im.id, im.timestamp_column
-        FROM inserted_message im;
-      `,
-            [id, title2, number2, message2],
-            (err, results) => {
-                if (error) {
-                    // Log and return a 500 status if the query fails.
-                    logger.error(`Error occurred: ${error.message}`);
-                    logger.error(`Stack: ${error.stack}`);
-                    return res.status(500).json({ error: error.message });
+        const sql = `
+            WITH inserted_message AS (
+                INSERT INTO messages(sender, title2, number2, message2)
+                VALUES(:sender, :title2, :number2, :message2)
+                RETURNING id, timestamp_column
+            ),
+            inserted_receivers AS (
+                INSERT INTO message_receiver(message_id, receiver_id)
+                SELECT DISTINCT im.id, u.id
+                FROM inserted_message im
+                CROSS JOIN users u
+                LEFT OUTER JOIN user_log ul ON u.id = ul.user_id
+                WHERE
+                    (u.type = '0'
+                    AND ul.end_date >= ((EXTRACT(EPOCH FROM CURRENT_TIMESTAMP AT TIME ZONE 'UTC') * 1000)::BIGINT)
+                    AND ul.start_date <= ((EXTRACT(EPOCH FROM CURRENT_TIMESTAMP AT TIME ZONE 'UTC') * 1000)::BIGINT)
+                    AND (
+                        (ul.plan IN (
+                            SELECT monthly_price_id FROM plans WHERE session = '0'
+                            UNION ALL
+                            SELECT yearly_price_id FROM plans WHERE session = '0'
+                        ) AND
+                        CURRENT_TIME AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' BETWEEN TIME '06:00' AND TIME '15:30')
+                        OR
+                        (ul.plan IN (
+                            SELECT monthly_price_id FROM plans WHERE session = '1'
+                            UNION ALL
+                            SELECT yearly_price_id FROM plans WHERE session = '1'
+                        ) AND
+                        (CURRENT_TIME AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' >= TIME '16:00' OR CURRENT_TIME  AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' <= TIME '06:00'))
+                        OR
+                        (ul.plan IN (
+                            SELECT monthly_price_id FROM plans WHERE session = '2'
+                            UNION ALL
+                            SELECT yearly_price_id FROM plans WHERE session = '2'
+                        ) AND
+                        (CURRENT_TIME AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' BETWEEN TIME '06:00' AND TIME '15:30' OR CURRENT_TIME  AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' >= TIME '16:00' OR CURRENT_TIME  AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Tokyo' <= TIME '06:00'))
+                        OR
+                        ul.plan IS NULL
+                    ))
+                    OR
+                    (u.type = '1')
+            )
+            SELECT im.id, im.timestamp_column FROM inserted_message im;
+            `;
+        const [results] = await sq.query(sql, {
+            replacements: { sender: id, title2: title2, number2: number2, message2: message2 },
+        });
+
+        if (!results.length) {
+            return res.status(500).json({ error: "Failed to insert message" });
+        }
+
+        const message_id = results[0].id;
+        const timestamp_column = results[0].timestamp_column;
+
+        // Fetch FCM tokens
+        const fcmTokensQuery = `
+            SELECT DISTINCT c.fcmtoken
+            FROM message_receiver mr
+            JOIN clients c ON c.user_id = mr.receiver_id
+            WHERE mr.message_id = :message_id;
+        `;
+
+        const tokenResults = await sq.query(fcmTokensQuery, {
+            replacements: { message_id: message_id },
+            type: sq.QueryTypes.SELECT
+        });
+
+        if (tokenResults.length > 0) {
+            const data = {
+                timestamp: timestamp_column,
+                title2: title2,
+                number2: number2,
+                msg2: message2
+            };
+
+            for (const row of tokenResults) {
+                const send_message = {
+                    message: {
+                        token: row.fcmtoken,
+                        notification: {
+                            body: "Click to view",
+                            title: "New Message",
+                        },
+                        data: data,
+                        android: {
+                            notification: {
+                                channel_id: "nikoniko",
+                            },
+                        },
+                    },
+                };
+                try {
+                    await sender.getAccessToken().then(async () => {
+                        await sender.sendMessage(send_message);
+                    });
+                } catch (e) {
+                    logger.error(`Error sending FCM: ${e.message}`);
+                    logger.error(`Stack: ${e.stack}`);
+                    return res.status(500).json({ error: e.message });
                 }
-
-                const message_id = results.rows[0].id;
-                const timestamp_column = results.rows[0].timestamp_column;
-
-                // Step 2: Retrieve the FCM tokens for all receivers of the message.
-                client.query(
-                    `
-                        SELECT DISTINCT c.fcmtoken
-                        FROM message_receiver mr
-                        JOIN clients c ON c.user_id = mr.receiver_id
-                        WHERE mr.message_id = $1;
-                    `,
-                    [message_id],
-                    (error, results) => {
-                        if (error) {
-                            // Log and return a 500 status if the query fails.
-                            logger.error(`Error occurred: ${error.message}`);
-                            logger.error(`Stack: ${error.stack}`);
-                            return res.status(500).json({ error: error.message });
-                        } else if (results.rows.length > 0) {
-                            // Prepare the notification payload for FCM.
-                            const data = {
-                                timestamp: timestamp_column,
-                                title2: title2,
-                                number2: number2,
-                                msg2: message2
-                            };
-
-                            // Send a notification to each FCM token.
-                            for (let i = 0; i < results.rows.length; i++) {
-                                const send_message = {
-                                    message: {
-                                        token: results.rows[i].fcmtoken,
-                                        notification: {
-                                            body: "Click to view",
-                                            title: "New Message",
-                                        },
-                                        data: data,
-                                        android: {
-                                            notification: {
-                                                channel_id: "nikoniko", // Android notification channel.
-                                            },
-                                        },
-                                    },
-                                };
-                                try {
-                                    // Send the message using FCM.
-                                    sender.getAccessToken().then(async () => {
-                                        await sender.sendMessage(send_message);
-                                    });
-                                } catch (error) {
-                                    // Log errors for each failed message.
-                                    logger.error(`Error occurred: ${error.message}`);
-                                    logger.error(`Stack: ${error.stack}`);
-                                    console.error(`Error for row ${i + 1}: ${error.message}`);
-                                    return res.status(500).json({ error: error.message });
-                                }
-                            }
-                            console.log("Messages sent");
-                            return res.status(200).json({
-                                message: "Messages Sent",
-                            });
-                        } else {
-                            // No active clients found to receive the message.
-                            console.log({ message: "No Active clients" });
-                            return res.status(200).json({ message: "Messages Sent" });
-                        }
-                    }
-                );
             }
-        );
-    } catch (error) {
-        // Log any unexpected errors and return a 500 status.
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        return res.status(500).json({ error: error.message });
+
+            console.log("Messages sent");
+        }
+
+        return res.status(200).json({ message: "Messages Sent" });
+    } catch (err) {
+        logger.error(`Error occurred: ${err.message}`);
+        logger.error(`Stack: ${err.stack}`);
+        return res.status(500).json({ error: err.message });
     }
 });
-
 
 //update frequency
 app.put(`/api/${encodePermissions(false, true, false)}/frequency/:newFrequency`, auth, async (req, res) => {
@@ -627,11 +642,11 @@ app.put(`/api/${encodePermissions(false, true, false)}/frequency/:newFrequency`,
         } else {
             return res.status(400).json({ error: "Frequency not found or unchanged" });
         }
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error("Error updating frequency:", error.message);
-        return res.status(500).json({ error: error.message });
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error("Error updating frequency:", e.message);
+        return res.status(500).json({ error: e.message });
     }
 });
 
@@ -650,107 +665,74 @@ app.post(`/api/${encodePermissions(false, true, false)}/news`, auth, async (req,
 
         console.log("News added");
         return res.status(200).json({ message: "News added" });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error("Error adding news:", error.message);
-        return res.status(500).json({ error: error.message });
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error("Error adding news:", e.message);
+        return res.status(500).json({ error: e.message });
     }
 });
 
 app.delete(`/api/${encodePermissions(false, true, false)}/news/:id`, auth, async (req, res) => {
     try {
-        client.query(
-            `
-            DELETE FROM news
-            WHERE id = $1
-            `,
-            [req.params.id],
-            (error, results) => {
-                if (error) {
-                    logger.error(`Error occurred: ${error.message}`);
-                    logger.error(`Stack: ${error.stack}`);
-                    return res.status(501).json({ error: error.message });
-                }
-                console.log("News deleted");
-                return res.status(200).send({ message: "News deleted" });
-            }
-        );
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+        const deletedCount = await News.destroy({
+            where: { id: req.params.id }
+        });
 
-        return res.status(500).json({ error: error.message });
+        if (deletedCount === 0) {
+            return res.status(404).json({ error: "News not found" });
+        }
+
+        console.log("News deleted");
+        return res.status(200).json({ message: "News deleted" });
+    } catch (err) {
+        logger.error(`Error occurred: ${err.message}`);
+        logger.error(`Stack: ${err.stack}`);
+        return res.status(500).json({ error: err.message });
     }
 });
 
 //Ads Creation
 app.post(`/api/${encodePermissions(false, true, false)}/ad`, auth, async (req, res) => {
     try {
-        let {
+        const { title, description, imageurl, redirecturl, bgcolor, titlecolor, descriptioncolor } = req.body;
+
+        await Ad.create({
             title,
             description,
             imageurl,
             redirecturl,
             bgcolor,
             titlecolor,
-            descriptioncolor,
-        } = req.body;
-        client.query(
-            `
-            INSERT INTO ads(title, description, imageurl, redirecturl, bgcolor, titlecolor, descriptioncolor)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-            [
-                title,
-                description,
-                imageurl,
-                redirecturl,
-                bgcolor,
-                titlecolor,
-                descriptioncolor,
-            ],
-            (error, results) => {
-                if (error) {
-                    logger.error(`Error occurred: ${error.message}`);
-                    logger.error(`Stack: ${error.stack}`);
-                    return res.status(500).json({ error: error.message });
-                }
-                console.log("Ads added");
-                return res.status(200).json({ message: "Ads added" });
-            }
-        );
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+            descriptioncolor
+        });
 
-        return res.status(500).json({ error: error.message });
+        console.log("Ads added");
+        return res.status(200).json({ message: "Ads added" });
+    } catch (err) {
+        logger.error(`Error occurred: ${err.message}`);
+        logger.error(`Stack: ${err.stack}`);
+        return res.status(500).json({ error: err.message });
     }
 });
 
 //delete Ad
 app.delete(`/api/${encodePermissions(false, true, false)}/ad/:id`, auth, async (req, res) => {
     try {
-        client.query(
-            `
-            DELETE FROM ads
-            WHERE id = $1
-            `,
-            [req.params.id],
-            (error, results) => {
-                if (error) {
-                    logger.error(`Error occurred: ${error.message}`);
-                    logger.error(`Stack: ${error.stack}`);
-                    return res.status(501).json({ error: error.message });
-                }
-                console.log("Ad deleted");
-                return res.status(200).send({ message: "Ad deleted" });
-            }
-        );
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+        const deletedCount = await Ad.destroy({
+            where: { id: req.params.id }
+        });
 
-        return res.status(500).json({ error: error.message });
+        if (deletedCount === 0) {
+            return res.status(404).json({ error: "Ad not found" });
+        }
+
+        console.log("Ad deleted");
+        return res.status(200).json({ message: "Ad deleted" });
+    } catch (err) {
+        logger.error(`Error occurred: ${err.message}`);
+        logger.error(`Stack: ${err.stack}`);
+        return res.status(500).json({ error: err.message });
     }
 });
 
@@ -769,11 +751,11 @@ app.get(`/api/${encodePermissions(true, false, false)}/admins`, auth, async (req
         console.log(admins);
         console.log("Fetched Admins");
         return res.status(200).json(admins);
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error(error);
-        return res.status(500).json({ error: error.message });
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error(e);
+        return res.status(500).json({ error: e.message });
     }
 });
 
@@ -809,9 +791,9 @@ app.get(`/api/${encodePermissions(true, false, false)}/users`, auth, async (req,
         });
 
         res.status(200).send(users);
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
 
         return res.sendStatus(500);
     }
@@ -837,9 +819,9 @@ app.put(`/api/${encodePermissions(true, false, false)}/admins/type`, auth, async
 
         console.log("Admin Activated");
         return res.status(200).json({ message: "Admin Activated" });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
         return res.sendStatus(500);
     }
 });
@@ -879,9 +861,9 @@ app.put(`/api/${encodePermissions(true, false, false)}/users`, auth, async (req,
             console.log("User Activated");
             return res.status(200).json({ message: "User Activated" });
         });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
         return res.sendStatus(500);
     }
 });
@@ -903,11 +885,11 @@ app.put(`/api/${encodePermissions(false, false, false)}/users/password`, async (
             { where: { email: email } }          // Condition to match records
         );
         return res.status(200).json({ message: "Password changed" });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
 
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: e.message });
     }
 });
 
@@ -917,10 +899,10 @@ app.post(`/api/${encodePermissions(false, false, false)}/otp`, async (req, res, 
         const { email, isUser } = req.body;
         const user = await User.findOne({ where: { email: email } });
         if (isUser && !user) {
-            return res.status(400).json({ message: "Email does not exist" });
+            return res.status(400).json({ code: 1002, message: "Email does not exist" });
         }
         if (!isUser && user) {
-            return res.status(400).json({ message: "Email already exists" });
+            return res.status(400).json({ code: 1001, message: "Email already exists" });
         }
 
         const otp = generateOTP();
@@ -936,11 +918,11 @@ app.post(`/api/${encodePermissions(false, false, false)}/otp`, async (req, res, 
             message: renderedHtml,
         });
 
-        res.status(200).json({ otp: generateHash((otp+email), (otp+email)), success: true, message: 'OTP sent successfully' });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error('Error sending OTP:', error);
+        res.status(200).json({ otp: generateHash((otp + email), (otp + email)), success: true, code: 2001, message: 'OTP sent successfully' });
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error('Error sending OTP:', e);
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 }
@@ -982,10 +964,10 @@ app.post(`/api/${encodePermissions(false, false, true)}/enquiry`, auth, async (r
             message: renderedHtml
         });
         return res.status(200).json({ message: "Enquiry Submitted" });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error("Error registering user:", error);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error("Error registering user:", e);
         return res.sendStatus(500);
     }
 
@@ -996,14 +978,14 @@ app.get(`/api/${encodePermissions(false, true, false)}/enquiry`, auth, async (re
         const enquiries = await Enquiry.findAll({
             order: [['created_time', 'DESC']], // Sorts from newest to oldest
         });
-        enquiries.forEach((error) => {
-            error.dataValues['formatted_id'] = error.formatted_id;
+        enquiries.forEach((e) => {
+            e.dataValues['formatted_id'] = e.formatted_id;
         });
         res.status(200).send({ enquiries: enquiries });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error("Error getting enquiries:", error);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error("Error getting enquiries:", e);
         return res.sendStatus(500);
     }
 });
@@ -1039,34 +1021,11 @@ app.put(`/api/${encodePermissions(false, true, false)}/enquiry/status/resolved/:
 
         console.log(`Enquiry with ID ${id} marked as resolved`);
         return res.status(200).json({ message: 'Enquiry marked as resolved', enquiry });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error('Error resolving enquiry:', error);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error('Error resolving enquiry:', e);
         return res.status(500).json({ error: 'Failed to mark enquiry as resolved' });
-    }
-});
-
-//Plans fetch
-app.get(`/api/${encodePermissions(false, false, true)}/plans`, auth, async (req, res) => {
-    try {
-        client.query(
-            `SELECT * FROM plans order by plan_name`,
-            (error, results) => {
-                if (error) {
-                    logger.error(`Error occurred: ${error.message}`);
-                    logger.error(`Stack: ${error.stack}`);
-                    return res.status(501).json({ error: error.message });
-                }
-                console.log("plans fetched");
-                return res.status(200).json(results.rows);
-            }
-        );
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-
-        return res.status(500).json({ error: error.message });
     }
 });
 
@@ -1148,10 +1107,10 @@ app.get(`/api/${encodePermissions(false, false, true)}/orders`, auth, async (req
 
         // Return the orders as a response
         res.json({ success: true, orders: orders });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        res.status(500).json({ success: false, error: error.message });
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        res.status(500).json({ success: false, error: e.message });
     }
 });
 
@@ -1174,16 +1133,17 @@ app.put(`/api/${encodePermissions(false, true, true)}/language/:code`, auth, asy
             console.log("Profile Updated");
             return res.status(200).json({ message: "Language Updated" });
         }
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error(error.message);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error(e.message);
         return res.sendStatus(500);
     }
 });
 
 //Stripe webhook
-app.post("/webhook",
+app.post(
+    "/webhook",
     express.raw({ type: "application/json" }),
     async (req, res) => {
         let data;
@@ -1204,9 +1164,9 @@ app.post("/webhook",
                     header,
                     process.env.STRIPE_WEBHOOK_SECRET
                 );
-            } catch (error) {
-                logger.error(`Error occurred: ${error.message}`);
-                logger.error(`Stack: ${error.stack}`);
+            } catch (e) {
+                logger.error(`Error occurred: ${e.message}`);
+                logger.error(`Stack: ${e.stack}`);
                 return res.sendStatus(400);
             }
 
@@ -1330,42 +1290,42 @@ app.post("/webhook",
                                     await sender.getAccessToken().then(async () => {
                                         await sender.sendMessage(send_message);
                                     });
-                                } catch (error) {
-                                    logger.error(`Error occurred: ${error.message}`);
-                                    logger.error(`Stack: ${error.stack}`);
-                                    console.error(`Error for fcmtoken ${client.fcmtoken}: ${error.message}`);
-                                    return res.status(500).json({ error: error.message });
+                                } catch (e) {
+                                    logger.error(`Error occurred: ${e.message}`);
+                                    logger.error(`Stack: ${e.stack}`);
+                                    console.error(`Error for fcmtoken ${client.fcmtoken}: ${e.message}`);
+                                    return res.status(500).json({ error: e.message });
                                 }
                             }
                             // Commit the transaction
                             await transaction.commit();
                             console.log('Updated payments and user log successfully');
                             res.sendStatus(200);
-                        } catch (error) {
-                            logger.error(`Error occurred: ${error.message}`);
-                            logger.error(`Stack: ${error.stack}`);
-                            console.error("Error occurred:", error.message);
-                            return res.status(500).json({ error: error.message });
+                        } catch (e) {
+                            logger.error(`Error occurred: ${e.message}`);
+                            logger.error(`Stack: ${e.stack}`);
+                            console.error("Error occurred:", e.message);
+                            return res.status(500).json({ error: e.message });
                         }
-                    } catch (error) {
-                        logger.error(`Error occurred: ${error.message}`);
-                        logger.error(`Stack: ${error.stack}`);
+                    } catch (e) {
+                        logger.error(`Error occurred: ${e.message}`);
+                        logger.error(`Stack: ${e.stack}`);
                         // Rollback the transaction in case of error
                         await transaction.rollback();
-                        console.error('Error updating payments and user log:', error.message);
+                        console.error('Error updating payments and user log:', e.message);
                     }
                 }
             }
-        } catch (error) {
-            logger.error(`Error occurred: ${error.message}`);
-            logger.error(`Stack: ${error.stack}`);
+        } catch (e) {
+            logger.error(`Error occurred: ${e.message}`);
+            logger.error(`Stack: ${e.stack}`);
 
-            res.status(500).send({ error: error.message });
+            res.status(500).send({ error: e.message });
         }
     }
 );
 
-app.get(`/api/${encodePermissions(false, false, true)}/checkout/:token/:priceID`, async (req, res) => {
+app.get(`/${encodePermissions(false, false, true)}/checkout/:token/:priceID`, async (req, res) => {
     try {
         const priceId = req.params.priceID;
         const verified = jwt.verify(req.params.token, "passwordKey");
@@ -1384,10 +1344,7 @@ app.get(`/api/${encodePermissions(false, false, true)}/checkout/:token/:priceID`
         if (!user || !hasAccess(req.url.split("/")[1], user.type)) {
             return res.sendStatus(401);
         }
-        const url = process.env.REDIRECT_URL || 'https://nikoniko4976.com/';
-
-        // Step 1: Query the database for the user
-
+        const url = process.env.REDIRECT_URL || 'https://nikoniko4976.com/payment_success';
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -1429,10 +1386,10 @@ app.get(`/api/${encodePermissions(false, false, true)}/checkout/:token/:priceID`
 
         // Redirect to the Stripe session URL
         res.redirect(session.url);
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error("Error:", error.message);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error("Error:", e.message);
         res.sendStatus(500);
     }
 });
@@ -1455,128 +1412,94 @@ app.get("/portalconfig", async (req, res) => {
                     enabled: true,
                     products: [
                         {
-                            prices: ["price_1Qr9esJoi6NEnPRe5bcGipxT", "price_1Qt9tMJoi6NEnPRefsrmauUL"],
-                            product: "prod_RkeygR1NDbH5e7",
+                            prices: ["price_1QGjyRGXGwXPwI5cKZVl3CnR", "price_1QGjyRGXGwXPwI5cBg1UuBjG"],
+                            product: "prod_R9222RFbol3W2j",
                         },
                         {
-                            prices: ["price_1Qr9frJoi6NEnPRe2JnXlQLc", "price_1Qr9frJoi6NEnPRe2JnXlQLc"],
-                            product: "prod_RkezX64LJa2DfJ",
+                            prices: ["price_1QGk07GXGwXPwI5cbcHgIgUM", "price_1QGk07GXGwXPwI5cztfWLGmN"],
+                            product: "prod_R9246yVXdfTIU9",
                         },
                         {
-                            prices: ["price_1Qr9hEJoi6NEnPReryffiOna", "price_1Qt9xiJoi6NEnPRen6SASz09"],
-                            product: "prod_Rkf1P18r2plovd",
+                            prices: ["price_1QGlQlGXGwXPwI5cbcqJ5sXZ", "price_1QGlQlGXGwXPwI5c2ocDI9BN"],
+                            product: "prod_R93XiqjDVgSvBO",
                         },
                     ],
                     proration_behavior: "always_invoice",
                 },
             },
-            default_return_url: "https://nikoniko4976.com/",
+            //default_return_url: "https://nikoniko4976.com/",
         });
         res.status(200).send(configuration);
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
 
-        res.status(500).send({ error: error.message });
+        res.status(500).send({ error: e.message });
     }
 });
 
 app.get(`/${encodePermissions(false, false, true)}/portal/:token`, async (req, res) => {
     try {
-        // Step 1: Verify the token using JWT with a predefined "passwordKey".
-        // This ensures only requests with a valid token can proceed.
         const verified = jwt.verify(req.params.token, "passwordKey");
         if (!verified) {
-            // If verification fails, send a 401 Unauthorized status.
             return res.sendStatus(401);
         }
-
-        // Step 2: Retrieve the user from the database by their ID from the verified token.
         const user = await User.findByPk(verified.id);
-
-        // Step 3: Ensure user exists and check if the user has permission to access the endpoint.
-        // `req.url.split("/")[1]` extracts the encoded permission from the URL.
-        // `hasAccess` checks the user's type against the required permission.
         if (!user || !hasAccess(req.url.split("/")[1], user.type)) {
             return res.sendStatus(401);
         }
-
-        // Step 4: Define the return URL for the Stripe billing portal.
-        // Uses an environment variable if available, otherwise defaults to 'https://nikoniko4976.com/'.
         const url = process.env.REDIRECT_URL || 'https://nikoniko4976.com/';
 
-        // Step 5: Create a Stripe billing portal session for the user.
-        // Uses the user's Stripe ID and a portal configuration ID.
-        // Configuration ID defaults to a preset value if not provided via environment variables.
         const portalSession = await stripe.billingPortal.sessions.create({
             customer: user.stripe_id,
-            configuration: process.env.PORTAL_CONFIGURATION_ID || "bpc_1QZGwyGXGwXPwI5c77CxPMxw",
-            return_url: url
+            configuration: process.env.PORTAL_CONFIGURATION_ID || "bpc_1Qsqf9GXGwXPwI5cIhE3eC96",
+            //return_url: url
         });
-
-        // Step 6: Log the successful creation of the portal session.
         console.log("Portal Session created");
-
-        // Step 7: Redirect the user to the Stripe portal session URL.
         res.redirect(portalSession.url);
-    } catch (error) {
-        // Error handling: log the error message and stack trace.
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
 
-        // Respond with a 500 status and send the error message in the response body.
-        res.status(500).send({ error: error.message });
+        res.status(500).send({ error: e.message });
     }
-});
-
-
+}
+);
 
 async function createSupportFilesEndpoints(language) {
     try {
-        // Define the directory path where HTML files are stored for the given language
         const dirPath = path.join(__dirname, 'support_files', language, 'html_files');
-        
-        // Read the directory to get a list of files
         readdir(dirPath, (err, files) => {
-            if (error) {  // Handle errors during directory reading
+            if (err) {
                 console.error('Error reading directory:', err);
                 return;
             }
 
-            // Filter the files to only include .html files
+            // Filter .html files
             const htmlFiles = files.filter(file => file.endsWith('.html'));
-
-            // Loop through each .html file and create an endpoint for it
+            // Create an endpoint for each HTML file
             for (const file of htmlFiles) {
-                // Create a URL route for the file based on its name and language
                 const routeName = `/support/${language}/${path.basename(file, '.html')}`;
-                
-                // Get the full path to the file
                 const filePath = path.join(dirPath, file);
 
-                // Define a GET route to serve the HTML file
                 app.get(routeName, (req, res) => {
-                    res.sendFile(filePath, err => {  // Send the HTML file as a response
-                        if (error) {  // Handle errors if the file fails to send
+                    res.sendFile(filePath, err => {
+                        if (err) {
                             console.error(`Error sending file ${filePath}:`, err);
                             res.status(500).send('Internal Server Error');
                         }
                     });
                 });
 
-                // Log the creation of the endpoint to the console
                 console.log(`Endpoint created: ${routeName}`);
             }
         });
-    } catch (error) {  // Handle any other errors during the process
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error(`Error reading directory or creating endpoints for ${language}:`, err);
+    } catch (e) {
+        logger.error(`Error occurred: ${e.message}`);
+        logger.error(`Stack: ${e.stack}`);
+        console.error(`Error reading directory or creating endpoints for ${language}:`, e);
     }
 }
-
-
-
 
 (async function () {
     await createSupportFilesEndpoints('en');
@@ -1584,67 +1507,29 @@ async function createSupportFilesEndpoints(language) {
 })();
 
 app.get('/support/en', (req, res) => {
-    readFile(path.join(__dirname, 'support_files', 'en', 'support.json'), 'utf8', (error, data) => {
-        if (error) {
+    readFile(path.join(__dirname, 'support_files', 'en', 'support.json'), 'utf8', (err, data) => {
+        if (err) {
             return res.status(500).json({ error: 'Failed to read JSON file' });
         }
         res.status(200).json(JSON.parse(data.toString()));
     });
 });
 
-
-
 app.get('/support/ja', (req, res) => {
-    readFile(path.join(__dirname, 'support_files', 'ja', 'support.json'), 'utf8', (error, data) => {
-        if (error) {
+    readFile(path.join(__dirname, 'support_files', 'ja', 'support.json'), 'utf8', (err, data) => {
+        if (err) {
             return res.status(500).json({ error: 'Failed to read JSON file' });
         }
         res.status(200).json(JSON.parse(data.toString()));
     });
 })
 
-
-
 //web app
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'web', 'index.html'));
 });
 
-//Super Admin registration
-app.post(`/api/${encodePermissions(true, false, false)}/register`, async (req, res) => {
-    let email = req.query.email;
-    let password = req.query.password;
-    try {
-        // Check if email already exists
-        const existingUser = await User.findOne({ where: { email: email } });
-
-        if (existingUser) {
-            return res.status(400).json({ message: "Email Already exists" });
-        }
-
-        // Hash the password (Assuming hashedpwd is obtained using some hashing function)
-        const hashedpwd = encrypt(password); // Replace with your actual hashing function
-
-        // Create a new admin user
-        await User.create({
-            email: email,
-            password: hashedpwd,
-            type: "2",
-        });
-
-        console.log("Super Admin registered");
-        return res.status(200).json({ message: "Super Admin registered" });
-    } catch (error) {
-        logger.error(`Error occurred: ${error.message}`);
-        logger.error(`Stack: ${error.stack}`);
-        console.error(error.message);
-        return res.sendStatus(500);
-    }
+//payment success page
+app.get('/payment_success', (req, res) => {
+    res.sendFile(path.join(__dirname, 'support_files', 'html_files', 'payment_success.html'));
 });
-
-
-
-
-
-
-
